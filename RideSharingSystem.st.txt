@@ -1,0 +1,191 @@
+"File: RideSharingSystem.st (Smalltalk)"
+"--- Class Definitions: Evaluate this block first ---"
+
+"Ride base class"
+Object subclass: #Ride
+instanceVariableNames: 'rideID pickupLocation dropoffLocation distance'
+classVariableNames: ''
+poolDictionaries: ''
+category: 'RideSharing'.
+
+Ride
+methodsFor: 'initialization'
+! initialize
+rideID := 0.
+pickupLocation := ''.
+dropoffLocation := ''.
+distance := 0.
+!
+
+Ride
+methodsFor: 'accessing'
+! rideID
+^ rideID.
+!
+! rideID: anID
+rideID := anID.
+!
+! pickupLocation
+^ pickupLocation.
+!
+! pickupLocation: aString
+pickupLocation := aString.
+!
+! dropoffLocation
+^ dropoffLocation.
+!
+! dropoffLocation: aString
+dropoffLocation := aString.
+!
+! distance
+^ distance.
+!
+! distance: kms
+distance := kms.
+!
+
+Ride
+methodsFor: 'calculations'
+! calculateFare
+^ distance \* 1.
+!
+
+Ride
+methodsFor: 'presentation'
+! rideDetails
+^ 'Ride ', rideID printString,
+' from ', pickupLocation,
+' to ', dropoffLocation,
+' (', distance printString, ' km) costs ',
+(self calculateFare) printString.
+!
+
+"StandardRide subclass"
+Ride subclass: #StandardRide
+instanceVariableNames: ''
+classVariableNames: ''
+poolDictionaries: ''
+category: 'RideSharing'.
+
+StandardRide
+methodsFor: 'calculations'
+! calculateFare
+^ distance \* 1.5.
+!
+
+"PremiumRide subclass"
+Ride subclass: #PremiumRide
+instanceVariableNames: ''
+classVariableNames: ''
+poolDictionaries: ''
+category: 'RideSharing'.
+
+PremiumRide
+methodsFor: 'calculations'
+! calculateFare
+^ (distance \* 2.5) + 5.
+!
+
+"Driver class"
+Object subclass: #Driver
+instanceVariableNames: 'driverID name rating assignedRides'
+classVariableNames: ''
+poolDictionaries: ''
+category: 'RideSharing'.
+
+Driver
+methodsFor: 'initialization'
+! initialize
+driverID := 0.
+name := ''.
+rating := 0.
+assignedRides := OrderedCollection new.
+!
+
+Driver
+methodsFor: 'accessing'
+! driverID: anID
+driverID := anID.
+!
+! name: aName
+name := aName.
+!
+! rating: aRating
+rating := aRating.
+!
+! addRide: aRide
+assignedRides add: aRide.
+!
+! getDriverInfo
+^ 'Driver ', name,
+' (ID: ', driverID printString, ') Rating: ',
+rating printString, '. Rides completed: ',
+assignedRides size printString.
+!
+
+"Rider class"
+Object subclass: #Rider
+instanceVariableNames: 'riderID name requestedRides'
+classVariableNames: ''
+poolDictionaries: ''
+category: 'RideSharing'.
+
+Rider
+methodsFor: 'initialization'
+! initialize
+riderID := 0.
+name := ''.
+requestedRides := OrderedCollection new.
+!
+
+Rider
+methodsFor: 'accessing'
+! riderID: anID
+riderID := anID.
+!
+! name: aName
+name := aName.
+!
+! requestRide: aRide
+requestedRides add: aRide.
+!
+! viewRides
+^ (requestedRides collect: \[:r | r rideDetails]).
+!
+
+"--- Demo Usage: Evaluate after classes compile ---"
+\| r1 r2 rides driver rider |
+
+"Create two rides"
+r1 := StandardRide new.
+r1 rideID: 101.
+r1 pickupLocation: 'Downtown'.
+r1 dropoffLocation: 'Airport'.
+r1 distance: 10.
+
+r2 := PremiumRide new.
+r2 rideID: 102.
+r2 pickupLocation: 'Mall'.
+r2 dropoffLocation: 'Hotel'.
+r2 distance: 5.
+
+"Polymorphic fare and details"
+rides := OrderedCollection with: r1 with: r2.
+rides do: \[:ride | Transcript show: ride rideDetails; cr].
+
+"Driver demo"
+driver := Driver new.
+driver driverID: 1.
+driver name: 'Alice'.
+driver rating: 4.9.
+driver addRide: r1.
+driver addRide: r2.
+Transcript show: driver getDriverInfo; cr.
+
+"Rider demo"
+rider := Rider new.
+rider riderID: 501.
+rider name: 'Bob'.
+rider requestRide: r1.
+rider requestRide: r2.
+(rider viewRides) do: \[:details | Transcript show: details; cr].
